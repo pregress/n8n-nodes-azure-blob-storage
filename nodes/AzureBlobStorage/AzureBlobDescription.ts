@@ -26,7 +26,7 @@ export const containerOperations: INodeProperties[] = [
 				value: 'getMany',
 				description: 'List all the containers in a storage account',
 				action: 'Get many containers',
-			}
+			},
 		],
 
 		default: 'getMany',
@@ -40,10 +40,10 @@ export const containerOperations: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['container'],
-				operation: ['create']
+				operation: ['create'],
 			},
 		},
-		default: ""
+		default: '',
 	},
 ];
 
@@ -73,7 +73,7 @@ export const blobOperations: INodeProperties[] = [
 				value: 'getMany',
 				description: 'List blobs inside a container',
 				action: 'Get many blobs',
-			}
+			},
 		],
 
 		default: 'getMany',
@@ -89,8 +89,8 @@ export const blobOperations: INodeProperties[] = [
 				resource: ['blob'],
 			},
 		},
-		default: "",
-		description: "The name of the storage container"
+		default: '',
+		description: 'The name of the storage container',
 	},
 	{
 		displayName: 'Blob Name',
@@ -104,7 +104,8 @@ export const blobOperations: INodeProperties[] = [
 				operation: ['upload'],
 			},
 		},
-		description: 'Name of the blob that will be created. You can create folders like this: my-folder/my-file.txt.',
+		description:
+			'Name of the blob that will be created. You can create folders like this: my-folder/my-file.txt.',
 	},
 	{
 		displayName: 'Binary Property',
