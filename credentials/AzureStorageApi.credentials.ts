@@ -1,5 +1,4 @@
 import {
-	IAuthenticateGeneric,
 	ICredentialType,
 	INodeProperties,
 } from 'n8n-workflow';
@@ -7,7 +6,7 @@ import {
 export class AzureStorageApi implements ICredentialType {
 	name = 'azureStorageApi';
 	displayName = 'Azure Blob Storage API';
-	documentationUrl = '<your-docs-url>';
+	documentationUrl = 'https://learn.microsoft.com/en-us/azure/storage/common/storage-account-keys-manage?toc=%2Fazure%2Fstorage%2Fblobs%2Ftoc.json&bc=%2Fazure%2Fstorage%2Fblobs%2Fbreadcrumb%2Ftoc.json&tabs=azure-portal#view-account-access-keys';
 	properties: INodeProperties[] = [
 		{
 			displayName: 'Connection string',
@@ -15,21 +14,5 @@ export class AzureStorageApi implements ICredentialType {
 			type: 'string',
 			default: '',
 		}
-	];
-
-	// This allows the credential to be used by other parts of n8n
-	// stating how this credential is injected as part of the request
-	// An example is the Http Request node that can make generic calls
-	// reusing this credential
-	authenticate: IAuthenticateGeneric = {
-		type: 'generic',
-		properties: {
-			headers: {				
-				Authorization: '={{"SharedKey " + $credentials.Account + ":" + $credentials.sharedKey}}',
-				Date: '={{new Date().toGMTString().replace("UTC", "GMT");}}'
-			}
-		},
-	};
-
-	
+	];	
 }

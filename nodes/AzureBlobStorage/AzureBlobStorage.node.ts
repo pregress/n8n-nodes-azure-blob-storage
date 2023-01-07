@@ -1,4 +1,4 @@
-import { IDataObject, IExecuteFunctions, INodeExecutionData, INodeType, INodeTypeDescription } from 'n8n-workflow';
+import { IBinaryKeyData, IDataObject, IExecuteFunctions, INodeExecutionData, INodeType, INodeTypeDescription, NodeOperationError } from 'n8n-workflow';
 import { containerOperations, blobOperations } from './AzureBlobDescription';
 
 export class AzureBlobStorage implements INodeType {
@@ -21,17 +21,6 @@ export class AzureBlobStorage implements INodeType {
 				required: true,
 			},
 		],
-		/**
-		 * In the properties array we have two mandatory options objects required
-		 *
-		 * [Resource & Operation]
-		 *
-		 * https://docs.n8n.io/integrations/creating-nodes/code/create-first-node/#resources-and-operations
-		 *
-		 * In our example, the operations are separated into their own file (HTTPVerbDescription.ts)
-		 * to keep this class easy to read.
-		 *
-		 */
 		properties: [
 			{
 				displayName: 'Resource',
@@ -64,42 +53,73 @@ export class AzureBlobStorage implements INodeType {
 		const { BlobServiceClient } = require("@azure/storage-blob");
 		const blobServiceClient = BlobServiceClient.fromConnectionString(credentials.connectionString);
 
+		const items = this.getInputData();
+		const returnData: IDataObject[] = [];
+		const length = items.length;
+
+		for (let i = 0; i < length; i++) {
+			if (resource === 'container') {
+				if (operation === 'create') {
+					const containerName = this.getNodeParameter('container', i) as string;
+					const containerClient = blobServiceClient.getContainerClient(containerName);
+					const createContainerResponse = await containerClient.create();
+
+					returnData.push(createContainerResponse as IDataObject);
+				}
+			}
+			else if (resource === 'blob') {
+				const containerName = this.getNodeParameter('container', i) as string;
+				const containerClient = blobServiceClient.getContainerClient(containerName);
+
+				if (operation === 'getMany') {
+					let blobs = containerClient.listBlobsFlat();
+					let arr: any[] = [];
+					for await (const blob of blobs) {
+						arr.push(blob);
+					}
+					returnData.push.apply(returnData, arr as IDataObject[]);
+				}
+				else if (operation === 'upload') {
+					const binaryPropertyName = this.getNodeParameter('binaryPropertyName', i) as string;
+
+					if (items[i].binary === undefined) {
+						throw new NodeOperationError(this.getNode(), 'No binary data exists on item!', {
+							itemIndex: i,
+						});
+					}
+
+					const item = items[i].binary as IBinaryKeyData;
+					const binaryData = item[binaryPropertyName];
+					const binaryDataBuffer = await this.helpers.getBinaryDataBuffer(i, binaryPropertyName);
+
+					if (binaryData === undefined) {
+						throw new NodeOperationError(
+							this.getNode(),
+							`No binary data property "${binaryPropertyName}" does not exists on item!`,
+							{ itemIndex: i },
+						);
+					}
+					const blobName = this.getNodeParameter('blobName', i) as string;
+					const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+					const uploadBlobResponse = await blockBlobClient.upload(binaryDataBuffer, binaryDataBuffer.length);
+					returnData.push(uploadBlobResponse as IDataObject);
+				}
+			}
+		}
+		
+		// No node input
 		if (resource === 'container') {
 			if (operation === 'getMany') {
-				let i = 1;
 				let containers = blobServiceClient.listContainers();
 				let arr: any[] = [];
 				for await (const container of containers) {
-					console.log(`Container ${i++}: ${container.name}`);
 					arr.push(container);
 				}
-				return [this.helpers.returnJsonArray(arr)];
+				returnData.push.apply(returnData, arr as IDataObject[]);
 			}
-			if(operation === 'create'){				
-				const containerName = this.getNodeParameter('container', 0) as string;
-				const containerClient = blobServiceClient.getContainerClient(containerName);
-  				const createContainerResponse = await containerClient.create();
-				return [this.helpers.returnJsonArray(createContainerResponse)];
-			}
-		}
-		else if (resource === 'blob') {
-			const containerName = this.getNodeParameter('container', 0) as string;
-			const containerClient = blobServiceClient.getContainerClient(containerName);
-			if (operation === 'getMany') {
-				let i = 1;
-				let blobs = containerClient.listBlobsFlat();
-				let arr: any[] = [];
-				for await (const blob of blobs) {
-					console.log(`Blob ${i++}: ${blob.name}`);
-					arr.push(blob);
-				}
-				return [this.helpers.returnJsonArray(arr)];
-			}
-			if(operation === 'upload'){
-				
-			}
+
 		}
 
-		return [this.helpers.returnJsonArray([])];
+		return [this.helpers.returnJsonArray(returnData)];
 	}
 }

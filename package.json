@@ -1,12 +1,12 @@
 {
   "name": "n8n-nodes-azure-blob-storage",
-  "version": "0.1.0",
-  "description": "",
+  "version": "0.0.1",
+  "description": "Node to interact with Azure blob storage. Create/Update/List containers, Create/update/list/delete blobs.",
   "keywords": [
-    "n8n-community-node-package"
+    "n8n-community-node-package", "azure", "storage", "blob"
   ],
   "license": "MIT",
-  "homepage": "https://pregress.be",
+  "homepage": "https://github.com/pregress/n8n-nodes-azure-blob-storage",
   "author": {
     "name": "Preben Huybrechts",
     "email": "hello@pregress.be"
