@@ -1,6 +1,6 @@
 # n8n-nodes-azure-blob-storage
 
-This is an n8n community node. It lets you use Azure blob storage_ in your n8n workflows.
+This is an n8n community node. It lets you use Azure blob storage in your n8n workflows.
 
 Azure Blob Storage is Microsoft's object storage solution for the cloud. Blob storage is optimized for storing massive amounts of unstructured data.
 
