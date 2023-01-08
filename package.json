@@ -1,6 +1,6 @@
 {
   "name": "n8n-nodes-azure-blob-storage",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Node to interact with Azure blob storage. Create/Update/List containers, Create/update/list/delete blobs.",
   "keywords": [
     "n8n-community-node-package", "azure", "storage", "blob"

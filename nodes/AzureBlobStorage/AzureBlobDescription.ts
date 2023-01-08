@@ -26,7 +26,14 @@ export const containerOperations: INodeProperties[] = [
 				value: 'getMany',
 				description: 'List all the containers in a storage account',
 				action: 'Get many containers',
+			},			
+			{
+				name: 'Delete',
+				value: 'delete',
+				description: 'Delete a container',
+				action: 'Delete a container',
 			},
+			
 		],
 
 		default: 'getMany',
@@ -36,11 +43,12 @@ export const containerOperations: INodeProperties[] = [
 		name: 'container',
 		type: 'string',
 		noDataExpression: true,
+		required: true,
 
 		displayOptions: {
 			show: {
 				resource: ['container'],
-				operation: ['create'],
+				operation: ['create', 'delete'],
 			},
 		},
 		default: '',
@@ -79,6 +87,12 @@ export const blobOperations: INodeProperties[] = [
 				value: 'get',
 				description: 'Get the binary data from a blob',
 				action: "Get a blob"
+			},
+			{
+				name: 'Delete',
+				value: 'delete',
+				description: 'Delete a blob from a container',
+				action: 'Delete a blob'
 			}
 		],
 
@@ -108,7 +122,7 @@ export const blobOperations: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['blob'],
-				operation: ['upload', 'get'],
+				operation: ['upload', 'get', 'delete'],
 			},
 		},
 		description:

@@ -74,6 +74,13 @@ export class AzureBlobStorage implements INodeType {
 
 					returnData.push(createContainerResponse as IDataObject);
 				}
+				else if(operation === 'delete'){
+					const containerName = this.getNodeParameter('container', i) as string;
+					const containerClient = blobServiceClient.getContainerClient(containerName);
+					const deleteContainerResponse = await containerClient.delete();
+
+					returnData.push(deleteContainerResponse as IDataObject);
+				}
 			} else if (resource === 'blob') {
 				const containerName = this.getNodeParameter('container', i) as string;
 				const containerClient = blobServiceClient.getContainerClient(containerName);
@@ -142,6 +149,15 @@ export class AzureBlobStorage implements INodeType {
 						binaryDataBuffer.length,
 					);
 					returnData.push(uploadBlobResponse as IDataObject);
+				} else if(operation === 'delete'){
+					const blobName = this.getNodeParameter('blobName', i) as string;
+					const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+					const options = {
+						deleteSnapshots: 'include' // or 'only'
+					  }
+
+					const deleteBlobResponse = await blockBlobClient.deleteIfExists(options);
+					returnData.push(deleteBlobResponse as IDataObject);
 				}
 			}
 		}
