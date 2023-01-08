@@ -74,6 +74,12 @@ export const blobOperations: INodeProperties[] = [
 				description: 'List blobs inside a container',
 				action: 'Get many blobs',
 			},
+			{
+				name: 'Get',
+				value: 'get',
+				description: 'Get the binary data from a blob',
+				action: "Get a blob"
+			}
 		],
 
 		default: 'getMany',
@@ -83,6 +89,7 @@ export const blobOperations: INodeProperties[] = [
 		name: 'container',
 		type: 'string',
 		noDataExpression: true,
+		required:true,
 
 		displayOptions: {
 			show: {
@@ -101,7 +108,7 @@ export const blobOperations: INodeProperties[] = [
 		displayOptions: {
 			show: {
 				resource: ['blob'],
-				operation: ['upload'],
+				operation: ['upload', 'get'],
 			},
 		},
 		description:

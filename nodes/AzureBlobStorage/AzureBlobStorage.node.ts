@@ -85,6 +85,36 @@ export class AzureBlobStorage implements INodeType {
 						arr.push(blob);
 					}
 					returnData.push.apply(returnData, arr as IDataObject[]);
+				} else if (operation === 'get') {
+					const blobName = this.getNodeParameter('blobName', i) as string;
+					const blockBlobClient = containerClient.getBlockBlobClient(blobName);
+					const downloadBlockBlobResponse = await blockBlobClient.download();
+
+					const newItemBinary: IBinaryKeyData = {};
+					const buffer = await streamToBuffer(downloadBlockBlobResponse.readableStreamBody) as Buffer;
+					newItemBinary.data = await this.helpers.prepareBinaryData(buffer);
+					newItemBinary.data.mimeType = downloadBlockBlobResponse.contentType;
+
+					returnData.push({
+						json: {
+							"blobName": blobName,
+							"blobType": downloadBlockBlobResponse.blobType,
+							"contentEncoding" : downloadBlockBlobResponse.contentEncoding,
+							"contentLanguage" : downloadBlockBlobResponse.contentLanguage,
+							"contentLength" : downloadBlockBlobResponse.contentLength,
+							"contentType" : downloadBlockBlobResponse.contentType,
+							"lastAccessed" : downloadBlockBlobResponse.lastAccessed,
+							"lastModified" : downloadBlockBlobResponse.lastModified,
+							"leaseDuration" : downloadBlockBlobResponse.leaseDuration,
+							"leaseState" : downloadBlockBlobResponse.leaseState,
+							"leaseStatus" : downloadBlockBlobResponse.leaseStatus,
+						},
+						pairedItem: {
+						  item: i,
+						},
+						binary: Object.keys(newItemBinary).length === 0 ? undefined : newItemBinary,
+					  });
+
 				} else if (operation === 'upload') {
 					const binaryPropertyName = this.getNodeParameter('binaryPropertyName', i) as string;
 
@@ -131,3 +161,17 @@ export class AzureBlobStorage implements INodeType {
 		return [this.helpers.returnJsonArray(returnData)];
 	}
 }
+
+
+async function streamToBuffer(readableStream: NodeJS.ReadableStream) {
+    return new Promise((resolve, reject) => {
+      const chunks: Buffer[] = [];
+      readableStream.on("data", (data: WithImplicitCoercion<ArrayBuffer | SharedArrayBuffer>) => {
+        chunks.push(data instanceof Buffer ? data : Buffer.from(data));
+      });
+      readableStream.on("end", () => {
+        resolve(Buffer.concat(chunks));
+      });
+      readableStream.on("error", reject);
+    });
+  }
