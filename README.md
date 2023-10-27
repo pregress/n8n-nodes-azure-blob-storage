@@ -60,6 +60,7 @@ Tested on: 0.209.4
 
 ## Version history
 
+- __0.1.0__ Updated crypto.js https://github.com/pregress/n8n-nodes-azure-blob-storage/pull/4
 - __0.0.2__ Added: Get Blob, Delete Blob, Delete Container
 - __0.0.1__ Inital version
 
